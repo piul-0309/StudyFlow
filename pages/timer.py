@@ -9,20 +9,20 @@ from database.database import (
 
 
 # --------------------------------
-# Create Database Tables
+# Database
 # --------------------------------
 
 create_table()
 
 
 # --------------------------------
-# Page Title
+# Page Header
 # --------------------------------
 
 st.title("⏱️ Study Timer")
 
-st.write(
-    "Focus on your study session and track your actual study time."
+st.caption(
+    "Focus on one task at a time and track your actual study time."
 )
 
 
@@ -30,24 +30,30 @@ st.write(
 # Session Details
 # --------------------------------
 
-st.subheader("📚 Session Details")
+st.subheader("📚 What are you studying?")
 
-subject = st.text_input(
-    "Subject",
-    placeholder="e.g. Data Structures"
-)
+col1, col2 = st.columns(2)
 
-topic = st.text_input(
-    "Topic",
-    placeholder="e.g. Binary Search"
-)
+with col1:
+
+    subject = st.text_input(
+        "Subject",
+        placeholder="e.g. Data Structures"
+    )
+
+with col2:
+
+    topic = st.text_input(
+        "Topic",
+        placeholder="e.g. Binary Search"
+    )
 
 
 # --------------------------------
 # Timer Settings
 # --------------------------------
 
-st.subheader("⚙️ Timer Settings")
+st.subheader("⚙️ Session Settings")
 
 duration_minutes = st.number_input(
     "Study Duration (minutes)",
@@ -74,50 +80,55 @@ if "start_time" not in st.session_state:
 if "elapsed_before_pause" not in st.session_state:
     st.session_state.elapsed_before_pause = 0
 
-if "pause_time" not in st.session_state:
-    st.session_state.pause_time = None
-
 
 # --------------------------------
-# Start Timer
+# Start Session
 # --------------------------------
 
 if not st.session_state.timer_running:
+
+    st.divider()
 
     if st.button(
         "▶️ Start Study Session",
         use_container_width=True
     ):
 
-        if subject and topic:
-
-            st.session_state.timer_running = True
-            st.session_state.timer_paused = False
-
-            st.session_state.start_time = datetime.now()
-
-            st.session_state.elapsed_before_pause = 0
-
-            st.session_state.pause_time = None
-
-            st.rerun()
-
-        else:
+        if not subject or not topic:
 
             st.error(
                 "Please enter both Subject and Topic."
             )
 
+        else:
+
+            st.session_state.timer_running = True
+            st.session_state.timer_paused = False
+            st.session_state.start_time = datetime.now()
+            st.session_state.elapsed_before_pause = 0
+
+            st.rerun()
+
 
 # --------------------------------
-# Running Timer
+# Active Timer
 # --------------------------------
 
 if st.session_state.timer_running:
 
-    st.success(
-        "🔥 Study session is running!"
-    )
+    st.divider()
+
+    if st.session_state.timer_paused:
+
+        st.warning(
+            "⏸️ Study session paused"
+        )
+
+    else:
+
+        st.success(
+            "🔥 Study session in progress"
+        )
 
 
     # --------------------------------
@@ -148,11 +159,10 @@ if st.session_state.timer_running:
 
 
     # --------------------------------
-    # Total Timer Duration
+    # Timer Calculation
     # --------------------------------
 
     total_seconds = duration_minutes * 60
-
 
     remaining_seconds = max(
         total_seconds - elapsed_seconds,
@@ -160,27 +170,18 @@ if st.session_state.timer_running:
     )
 
 
-    # --------------------------------
-    # Convert Time
-    # --------------------------------
-
     minutes = remaining_seconds // 60
     seconds = remaining_seconds % 60
 
 
     # --------------------------------
-    # Display Timer
+    # Timer Display
     # --------------------------------
 
-    st.metric(
-        "⏳ Time Remaining",
-        f"{minutes:02d}:{seconds:02d}"
+    st.subheader(
+        f"⏳ {minutes:02d}:{seconds:02d}"
     )
 
-
-    # --------------------------------
-    # Progress Bar
-    # --------------------------------
 
     progress = min(
         elapsed_seconds / total_seconds,
@@ -190,8 +191,14 @@ if st.session_state.timer_running:
     st.progress(progress)
 
 
+    st.caption(
+        f"{elapsed_seconds // 60} minute(s) completed "
+        f"of {duration_minutes} minute(s)"
+    )
+
+
     # --------------------------------
-    # Timer Completed
+    # Session Completed
     # --------------------------------
 
     if remaining_seconds == 0:
@@ -204,6 +211,10 @@ if st.session_state.timer_running:
                 -
                 st.session_state.start_time
             ).total_seconds() / 60
+        )
+
+        actual_duration += int(
+            st.session_state.elapsed_before_pause / 60
         )
 
         actual_duration = max(
@@ -228,15 +239,16 @@ if st.session_state.timer_running:
         )
 
 
+        st.metric(
+            "⏱️ Session Duration",
+            f"{actual_duration} minute(s)"
+        )
+
+
         st.session_state.timer_running = False
-
         st.session_state.timer_paused = False
-
         st.session_state.start_time = None
-
         st.session_state.elapsed_before_pause = 0
-
-        st.session_state.pause_time = None
 
 
     # --------------------------------
@@ -244,6 +256,8 @@ if st.session_state.timer_running:
     # --------------------------------
 
     else:
+
+        st.divider()
 
         col1, col2, col3 = st.columns(3)
 
@@ -273,8 +287,6 @@ if st.session_state.timer_running:
 
                     st.session_state.timer_paused = True
 
-                    st.session_state.pause_time = current_time
-
                     st.rerun()
 
             else:
@@ -285,14 +297,13 @@ if st.session_state.timer_running:
                 ):
 
                     st.session_state.timer_paused = False
-
                     st.session_state.start_time = datetime.now()
 
                     st.rerun()
 
 
         # --------------------------------
-        # Stop Session
+        # Stop
         # --------------------------------
 
         with col2:
@@ -304,17 +315,31 @@ if st.session_state.timer_running:
 
                 end_time = datetime.now()
 
-                actual_duration = int(
-                    (
-                        end_time
-                        -
-                        st.session_state.start_time
-                    ).total_seconds() / 60
-                )
+                if st.session_state.timer_paused:
 
-                actual_duration += int(
-                    st.session_state.elapsed_before_pause / 60
-                )
+                    actual_duration = int(
+                        st.session_state.elapsed_before_pause
+                        / 60
+                    )
+
+                else:
+
+                    current_elapsed = int(
+                        (
+                            end_time
+                            -
+                            st.session_state.start_time
+                        ).total_seconds()
+                    )
+
+                    actual_duration = int(
+                        (
+                            st.session_state.elapsed_before_pause
+                            +
+                            current_elapsed
+                        ) / 60
+                    )
+
 
                 actual_duration = max(
                     actual_duration,
@@ -332,18 +357,13 @@ if st.session_state.timer_running:
 
 
                 st.session_state.timer_running = False
-
                 st.session_state.timer_paused = False
-
                 st.session_state.start_time = None
-
                 st.session_state.elapsed_before_pause = 0
-
-                st.session_state.pause_time = None
 
 
                 st.success(
-                    f"Study session saved! ⏱️ "
+                    f"🎉 Session saved — "
                     f"{actual_duration} minute(s)"
                 )
 
@@ -351,7 +371,7 @@ if st.session_state.timer_running:
 
 
         # --------------------------------
-        # Reset Timer
+        # Reset
         # --------------------------------
 
         with col3:
@@ -362,30 +382,56 @@ if st.session_state.timer_running:
             ):
 
                 st.session_state.timer_running = False
-
                 st.session_state.timer_paused = False
-
                 st.session_state.start_time = None
-
                 st.session_state.elapsed_before_pause = 0
-
-                st.session_state.pause_time = None
 
                 st.rerun()
 
 
         # --------------------------------
-        # Paused Message
+        # Automatic Refresh
         # --------------------------------
 
-        if st.session_state.timer_paused:
-
-            st.warning(
-                "⏸️ Timer is paused. Click Resume to continue."
-            )
-
-        else:
+        if not st.session_state.timer_paused:
 
             time.sleep(1)
 
             st.rerun()
+
+
+# --------------------------------
+# Study Tips
+# --------------------------------
+
+if not st.session_state.timer_running:
+
+    st.divider()
+
+    st.subheader("💡 Focus Tips")
+
+    tip1, tip2, tip3 = st.columns(3)
+
+    with tip1:
+
+        st.markdown("### 🎯 One Task")
+
+        st.caption(
+            "Focus on one topic during each session."
+        )
+
+    with tip2:
+
+        st.markdown("### 📵 Remove Distractions")
+
+        st.caption(
+            "Keep unnecessary notifications and distractions away."
+        )
+
+    with tip3:
+
+        st.markdown("### ☕ Take Breaks")
+
+        st.caption(
+            "Take short breaks between longer study sessions."
+        )

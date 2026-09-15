@@ -17,45 +17,25 @@ from utils.analytics_utils import (
 
 
 # --------------------------------
-# Create Database Tables
+# Database
 # --------------------------------
 
 create_table()
 
 
 # --------------------------------
-# Page Title
+# Page Configuration
 # --------------------------------
 
-st.title("📈 StudyFlow Dashboard")
+st.title("📊 Dashboard")
 
-st.write(
-    "Your study progress and productivity at a glance."
+st.caption(
+    "A quick overview of your study progress and productivity."
 )
 
 
 # --------------------------------
-# Daily Study Goal
-# --------------------------------
-
-st.subheader("🎯 Daily Study Goal")
-
-if "daily_goal" not in st.session_state:
-    st.session_state.daily_goal = 2.0
-
-daily_goal = st.number_input(
-    "Set your daily study goal (hours)",
-    min_value=0.5,
-    max_value=12.0,
-    value=st.session_state.daily_goal,
-    step=0.5
-)
-
-st.session_state.daily_goal = daily_goal
-
-
-# --------------------------------
-# Load Data
+# Get Data
 # --------------------------------
 
 tasks = get_tasks()
@@ -65,11 +45,10 @@ df = sessions_to_dataframe(sessions)
 
 
 # --------------------------------
-# Study Statistics
+# Calculate Statistics
 # --------------------------------
 
 total_minutes = get_total_study_minutes(df)
-
 total_hours = total_minutes / 60
 
 completed_tasks = sum(
@@ -93,7 +72,9 @@ if not df.empty:
 
     today_df = df[df["date"] == today]
 
-    today_minutes = today_df["duration_minutes"].sum()
+    today_minutes = today_df[
+        "duration_minutes"
+    ].sum()
 
 else:
 
@@ -102,14 +83,72 @@ else:
 
 today_hours = today_minutes / 60
 
+
+# --------------------------------
+# Daily Goal
+# --------------------------------
+
+if "daily_goal" not in st.session_state:
+
+    st.session_state.daily_goal = 2.0
+
+
+st.subheader("🎯 Today's Goal")
+
+
+goal_col1, goal_col2 = st.columns([3, 1])
+
+
+with goal_col1:
+
+    daily_goal = st.slider(
+        "Daily study goal (hours)",
+        min_value=0.5,
+        max_value=12.0,
+        value=float(
+            st.session_state.daily_goal
+        ),
+        step=0.5
+    )
+
+    st.session_state.daily_goal = daily_goal
+
+
+with goal_col2:
+
+    st.metric(
+        "Today's Study",
+        f"{today_hours:.1f} h"
+    )
+
+
 goal_progress = min(
     today_hours / daily_goal,
     1.0
 )
 
 
+st.progress(goal_progress)
+
+
+if today_hours >= daily_goal:
+
+    st.success(
+        "🎉 Daily study goal achieved! Keep it up!"
+    )
+
+else:
+
+    remaining = daily_goal - today_hours
+
+    st.info(
+        f"📚 You need {remaining:.1f} more hour(s) "
+        "to reach today's goal."
+    )
+
+
 # --------------------------------
-# Dashboard Metrics
+# Main Statistics
 # --------------------------------
 
 st.divider()
@@ -120,8 +159,8 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
 
     st.metric(
-        "⏱️ Study Hours",
-        f"{total_hours:.1f}"
+        "⏱️ Total Study",
+        f"{total_hours:.1f} h"
     )
 
 
@@ -150,41 +189,13 @@ with col4:
 
 
 # --------------------------------
-# Today's Goal
+# Study Streak
 # --------------------------------
 
 st.divider()
 
-st.subheader("🎯 Today's Goal")
-
-st.progress(goal_progress)
-
-st.write(
-    f"**{today_hours:.1f} / {daily_goal:.1f} hours completed**"
-)
-
-
-if today_hours >= daily_goal:
-
-    st.success(
-        "🎉 Daily study goal achieved! Amazing work!"
-    )
-
-else:
-
-    remaining = daily_goal - today_hours
-
-    st.info(
-        f"📚 {remaining:.1f} more hour(s) "
-        "to reach today's goal."
-    )
-
-
-# --------------------------------
-# Study Streak
-# --------------------------------
-
 st.subheader("🔥 Study Streak")
+
 
 if df.empty:
 
@@ -192,7 +203,9 @@ if df.empty:
 
 else:
 
-    study_dates = set(df["date"])
+    study_dates = set(
+        df["date"]
+    )
 
     streak = 0
 
@@ -203,12 +216,14 @@ else:
         streak += 1
 
         current_date = (
-            current_date - timedelta(days=1)
+            current_date
+            -
+            timedelta(days=1)
         )
 
 
 st.metric(
-    "🔥 Current Study Streak",
+    "Current Streak",
     f"{streak} day(s)"
 )
 
@@ -216,86 +231,105 @@ st.metric(
 if streak == 0:
 
     st.write(
-        "Start studying today to begin your streak! 🚀"
+        "🚀 Start studying today to begin your streak!"
     )
 
 elif streak == 1:
 
     st.write(
-        "🔥 Great start! Come back tomorrow "
-        "to make it a 2-day streak."
+        "🔥 Great start! Study tomorrow to continue your streak."
     )
 
 else:
 
     st.success(
         f"🔥 Amazing! You've studied for "
-        f"{streak} consecutive days!"
+        f"{streak} consecutive days."
     )
 
 
 # --------------------------------
-# Study Analytics
+# Charts
 # --------------------------------
 
-if df.empty:
+if not df.empty:
 
     st.divider()
 
-    st.info(
-        "Start a study session using the Timer "
-        "to see your study analytics! 📚"
-    )
+    st.subheader("📈 Your Study Analytics")
 
-else:
 
-    # --------------------------------
-    # Subject-wise Study Time
-    # --------------------------------
-
-    st.divider()
-
-    st.subheader("📚 Study Time by Subject")
-
-    subject_summary = get_subject_summary(df)
-
-    fig_subject = px.pie(
-        subject_summary,
-        names="subject",
-        values="duration_minutes",
-        title="Where You're Spending Your Study Time"
-    )
-
-    st.plotly_chart(
-        fig_subject,
-        use_container_width=True
-    )
+    chart_col1, chart_col2 = st.columns(2)
 
 
     # --------------------------------
-    # Daily Study Trend
+    # Subject Chart
     # --------------------------------
 
-    st.subheader("📈 Study Trend")
+    with chart_col1:
 
-    daily_summary = get_daily_summary(df)
+        subject_summary = get_subject_summary(
+            df
+        )
 
-    fig_daily = px.line(
-        daily_summary,
-        x="date",
-        y="duration_minutes",
-        markers=True,
-        title="Daily Study Time",
-        labels={
-            "date": "Date",
-            "duration_minutes": "Study Minutes"
-        }
-    )
+        fig_subject = px.pie(
+            subject_summary,
+            names="subject",
+            values="duration_minutes",
+            hole=0.45,
+            title="Study Time by Subject"
+        )
 
-    st.plotly_chart(
-        fig_daily,
-        use_container_width=True
-    )
+        fig_subject.update_layout(
+            margin=dict(
+                l=20,
+                r=20,
+                t=60,
+                b=20
+            )
+        )
+
+        st.plotly_chart(
+            fig_subject,
+            use_container_width=True
+        )
+
+
+    # --------------------------------
+    # Daily Trend
+    # --------------------------------
+
+    with chart_col2:
+
+        daily_summary = get_daily_summary(
+            df
+        )
+
+        fig_daily = px.line(
+            daily_summary,
+            x="date",
+            y="duration_minutes",
+            markers=True,
+            title="Daily Study Trend",
+            labels={
+                "date": "Date",
+                "duration_minutes": "Study Minutes"
+            }
+        )
+
+        fig_daily.update_layout(
+            margin=dict(
+                l=20,
+                r=20,
+                t=60,
+                b=20
+            )
+        )
+
+        st.plotly_chart(
+            fig_daily,
+            use_container_width=True
+        )
 
 
 # --------------------------------
@@ -311,28 +345,43 @@ if total_tasks == 0:
 
     st.info(
         "No tasks added yet. "
-        "Go to Planner to add your first task."
+        "Go to the Planner to add your first task."
     )
 
 else:
 
     completion_percentage = (
-        completed_tasks / total_tasks
+        completed_tasks
+        /
+        total_tasks
     ) * 100
 
     st.progress(
         completion_percentage / 100
     )
 
-    st.write(
-        f"**{completed_tasks} of {total_tasks} tasks completed "
-        f"({completion_percentage:.1f}%)**"
-    )
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.metric(
+            "Tasks Completed",
+            f"{completed_tasks}/{total_tasks}"
+        )
+
+    with col2:
+
+        st.metric(
+            "Completion Rate",
+            f"{completion_percentage:.1f}%"
+        )
 
 
 # --------------------------------
 # Recent Tasks
 # --------------------------------
+
+st.divider()
 
 st.subheader("📋 Recent Tasks")
 
@@ -355,12 +404,28 @@ if tasks:
             icon = "⏳"
 
         st.write(
-            f"{icon} **{topic}** — "
-            f"{subject} — {priority} priority"
+            f"{icon} **{topic}**  •  "
+            f"{subject}  •  "
+            f"{priority} priority"
         )
 
 else:
 
     st.info(
         "No tasks available."
+    )
+
+
+# --------------------------------
+# Empty State
+# --------------------------------
+
+if df.empty and not tasks:
+
+    st.divider()
+
+    st.info(
+        "🌱 Your StudyFlow journey starts here! "
+        "Add a task in Planner and start a session "
+        "using the Timer."
     )

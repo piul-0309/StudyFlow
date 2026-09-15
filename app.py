@@ -14,7 +14,7 @@ st.set_page_config(
 
 
 # --------------------------------
-# Header
+# Hero Section
 # --------------------------------
 
 st.title("📚 StudyFlow")
@@ -25,81 +25,60 @@ st.subheader(
 
 st.write(
     "Plan your studies, track your study time, "
-    "analyze your productivity, and use machine learning "
-    "to understand your performance."
+    "understand your productivity, and use machine learning "
+    "to improve your study habits."
 )
 
 
 # --------------------------------
-# Quick Overview
+# Quick Navigation
 # --------------------------------
 
 st.divider()
 
-st.subheader("🚀 What can you do with StudyFlow?")
+st.subheader("🚀 Explore StudyFlow")
 
-
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 
 with col1:
 
-    st.markdown("### 📝 Plan")
+    st.markdown("### 📝 Planner")
 
-    st.write(
-        "Create study tasks, set priorities, "
-        "deadlines, and planned study durations."
+    st.caption(
+        "Create tasks, set priorities, and manage deadlines."
     )
 
 
 with col2:
 
-    st.markdown("### ⏱️ Track")
+    st.markdown("### ⏱️ Timer")
 
-    st.write(
-        "Use the study timer to record your "
-        "actual study sessions automatically."
+    st.caption(
+        "Focus on your studies and record your sessions."
     )
 
 
 with col3:
 
-    st.markdown("### 🤖 Improve")
+    st.markdown("### 📈 Analytics")
 
-    st.write(
-        "Analyze your study habits and get "
-        "ML-based performance predictions."
+    st.caption(
+        "Understand your study patterns and progress."
+    )
+
+
+with col4:
+
+    st.markdown("### 🤖 AI Prediction")
+
+    st.caption(
+        "Predict performance and get smart recommendations."
     )
 
 
 # --------------------------------
-# Features
-# --------------------------------
-
-st.divider()
-
-st.subheader("✨ StudyFlow Features")
-
-
-features = [
-    "📝 **Study Planner** — Organize subjects, topics, priorities and deadlines.",
-    "⏱️ **Study Timer** — Record your actual study sessions.",
-    "📈 **Analytics Dashboard** — Understand your study patterns.",
-    "🔥 **Study Streaks** — Stay consistent with your study routine.",
-    "🎯 **Daily Goals** — Set and track your daily study target.",
-    "🤖 **ML Predictions** — Predict performance using study habits.",
-    "💡 **Smart Recommendations** — Get personalized suggestions.",
-    "🗄️ **SQLite Database** — Store tasks and study sessions locally."
-]
-
-
-for feature in features:
-
-    st.write(feature)
-
-
-# --------------------------------
-# How StudyFlow Works
+# Main Workflow
 # --------------------------------
 
 st.divider()
@@ -115,7 +94,8 @@ with step1:
     st.markdown("### 1️⃣ Plan")
 
     st.write(
-        "Add your study tasks and deadlines."
+        "Add subjects, topics, priorities, "
+        "study durations, and deadlines."
     )
 
 
@@ -124,7 +104,8 @@ with step2:
     st.markdown("### 2️⃣ Study")
 
     st.write(
-        "Start the timer and focus on your task."
+        "Start the timer and record your actual "
+        "study sessions."
     )
 
 
@@ -133,7 +114,8 @@ with step3:
     st.markdown("### 3️⃣ Analyze")
 
     st.write(
-        "View your study hours, trends and progress."
+        "Use charts and statistics to understand "
+        "your productivity."
     )
 
 
@@ -143,56 +125,143 @@ with step4:
 
     st.write(
         "Use ML predictions and recommendations "
-        "to improve your study habits."
+        "to improve your study routine."
     )
 
 
 # --------------------------------
-# Tech Stack
+# Features
 # --------------------------------
 
 st.divider()
 
-st.subheader("🛠️ Technology Stack")
+st.subheader("✨ Key Features")
 
 
-tech_col1, tech_col2, tech_col3, tech_col4 = st.columns(4)
+feature_col1, feature_col2 = st.columns(2)
 
 
-with tech_col1:
+with feature_col1:
 
-    st.markdown("**🐍 Python**")
+    st.markdown(
+        """
+        **📝 Smart Study Planner**
 
-    st.caption(
-        "Core programming language"
+        • Create and manage study tasks  
+        • Set priorities and deadlines  
+        • Track completed and pending tasks  
+        • Detect overdue tasks  
+        """
+    )
+
+    st.markdown(
+        """
+        **⏱️ Focus Timer**
+
+        • Custom study duration  
+        • Pause and resume  
+        • Record actual study time  
+        • Save sessions automatically  
+        """
     )
 
 
-with tech_col2:
+with feature_col2:
 
-    st.markdown("**🎈 Streamlit**")
+    st.markdown(
+        """
+        **📊 Productivity Analytics**
 
-    st.caption(
-        "Web application framework"
+        • Study hours  
+        • Subject-wise analysis  
+        • Daily study trends  
+        • Session history  
+        """
+    )
+
+    st.markdown(
+        """
+        **🤖 Machine Learning**
+
+        • Linear Regression model  
+        • Performance prediction  
+        • Study habit analysis  
+        • Personalized recommendations  
+        """
     )
 
 
-with tech_col3:
+# --------------------------------
+# Technology Stack
+# --------------------------------
 
-    st.markdown("**📊 Pandas & Plotly**")
+st.divider()
+
+st.subheader("🛠️ Built With")
+
+
+tech1, tech2, tech3, tech4, tech5 = st.columns(5)
+
+
+with tech1:
+
+    st.markdown("### 🐍 Python")
 
     st.caption(
-        "Data analysis and visualization"
+        "Core programming"
     )
 
 
-with tech_col4:
+with tech2:
 
-    st.markdown("**🤖 Scikit-learn**")
+    st.markdown("### 🎈 Streamlit")
+
+    st.caption(
+        "Web application"
+    )
+
+
+with tech3:
+
+    st.markdown("### 🗄️ SQLite")
+
+    st.caption(
+        "Data storage"
+    )
+
+
+with tech4:
+
+    st.markdown("### 📊 Pandas")
+
+    st.caption(
+        "Data analysis"
+    )
+
+
+with tech5:
+
+    st.markdown("### 🤖 Scikit-learn")
 
     st.caption(
         "Machine learning"
     )
+
+
+# --------------------------------
+# Project Highlight
+# --------------------------------
+
+st.divider()
+
+st.subheader("💡 Why StudyFlow?")
+
+
+st.info(
+    "StudyFlow combines software development, databases, "
+    "data analysis, visualization, and machine learning "
+    "into one practical student productivity application."
+)
 
 
 # --------------------------------
@@ -201,12 +270,24 @@ with tech_col4:
 
 st.divider()
 
-st.subheader("🎯 Getting Started")
+st.subheader("🎯 Get Started")
 
-st.info(
-    "👈 Use the sidebar to open **Study Planner**, "
-    "**Study Timer**, **Analytics**, or "
-    "**AI Performance Prediction**."
+st.write(
+    "Use the sidebar to navigate through StudyFlow."
+)
+
+st.markdown(
+    """
+    **Recommended workflow:**
+
+    📝 Add a task in **Planner**  
+    ↓  
+    ⏱️ Study using the **Timer**  
+    ↓  
+    📈 Check your **Analytics**  
+    ↓  
+    🤖 Get insights from **AI Prediction**
+    """
 )
 
 
@@ -217,5 +298,5 @@ st.info(
 st.divider()
 
 st.caption(
-    "📚 StudyFlow — Plan • Study • Analyze • Improve"
+    "📚 StudyFlow  •  Plan • Study • Analyze • Improve"
 )

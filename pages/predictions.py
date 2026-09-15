@@ -5,14 +5,14 @@ from utils.helpers import generate_recommendations
 
 
 # --------------------------------
-# Page Title
+# Page Header
 # --------------------------------
 
 st.title("🤖 AI Performance Prediction")
 
-st.write(
-    "Use your study habits to predict your academic "
-    "performance and receive personalized recommendations."
+st.caption(
+    "Use your study habits to estimate performance "
+    "and get personalized study recommendations."
 )
 
 
@@ -20,76 +20,82 @@ st.write(
 # Input Section
 # --------------------------------
 
-st.subheader("📊 Your Study Information")
+st.subheader("📊 Your Study Pattern")
 
-col1, col2 = st.columns(2)
+with st.container(border=True):
 
+    col1, col2 = st.columns(2)
 
-with col1:
+    with col1:
 
-    study_hours = st.number_input(
-        "⏱️ Daily Study Hours",
-        min_value=0.0,
-        max_value=24.0,
-        value=2.0,
-        step=0.5
-    )
+        study_hours = st.number_input(
+            "⏱️ Daily Study Hours",
+            min_value=0.0,
+            max_value=24.0,
+            value=2.0,
+            step=0.5
+        )
 
-    tasks_completed = st.number_input(
-        "📝 Tasks Completed",
-        min_value=0,
-        max_value=50,
-        value=5,
-        step=1
-    )
+        tasks_completed = st.number_input(
+            "📝 Tasks Completed",
+            min_value=0,
+            max_value=50,
+            value=5,
+            step=1
+        )
 
+    with col2:
 
-with col2:
+        consistency = st.slider(
+            "📅 Study Consistency",
+            min_value=0,
+            max_value=100,
+            value=70,
+            help="How consistently you follow your study routine."
+        )
 
-    consistency = st.slider(
-        "📅 Study Consistency (%)",
-        min_value=0,
-        max_value=100,
-        value=70
-    )
-
-    previous_performance = st.slider(
-        "📈 Previous Performance Score",
-        min_value=0,
-        max_value=100,
-        value=65
-    )
+        previous_performance = st.slider(
+            "📈 Previous Performance",
+            min_value=0,
+            max_value=100,
+            value=65,
+            help="Your previous academic performance score."
+        )
 
 
 # --------------------------------
-# Study Information Summary
+# Input Summary
 # --------------------------------
 
 st.divider()
 
-st.subheader("📋 Your Current Study Pattern")
+st.subheader("📋 Study Pattern Summary")
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
+
     st.metric(
         "Study Hours",
         f"{study_hours:.1f} h"
     )
 
 with col2:
+
     st.metric(
         "Tasks",
         tasks_completed
     )
 
 with col3:
+
     st.metric(
         "Consistency",
         f"{consistency}%"
     )
 
 with col4:
+
     st.metric(
         "Previous Score",
         f"{previous_performance}/100"
@@ -97,7 +103,7 @@ with col4:
 
 
 # --------------------------------
-# Prediction Button
+# Prediction
 # --------------------------------
 
 st.divider()
@@ -108,7 +114,7 @@ if st.button(
 ):
 
     # --------------------------------
-    # ML Prediction
+    # Run ML Model
     # --------------------------------
 
     prediction = predict_performance(
@@ -119,7 +125,7 @@ if st.button(
     )
 
 
-    # Keep prediction between 0 and 100
+    # Keep prediction within 0-100
 
     prediction = max(
         0,
@@ -131,21 +137,31 @@ if st.button(
     # Prediction Result
     # --------------------------------
 
-    st.subheader("🎯 Prediction Result")
+    st.subheader("🎯 Your Prediction")
 
-    st.metric(
-        "Predicted Performance Score",
-        f"{prediction:.1f}/100"
+
+    result_col1, result_col2 = st.columns(
+        [1, 2]
     )
 
 
-    # --------------------------------
-    # Prediction Progress
-    # --------------------------------
+    with result_col1:
 
-    st.progress(
-        prediction / 100
-    )
+        st.metric(
+            "Predicted Performance",
+            f"{prediction:.1f}/100"
+        )
+
+
+    with result_col2:
+
+        st.progress(
+            prediction / 100
+        )
+
+        st.caption(
+            f"{prediction:.1f}% predicted performance"
+        )
 
 
     # --------------------------------
@@ -154,30 +170,30 @@ if st.button(
 
     if prediction >= 80:
 
-        st.success(
-            "🏆 Excellent! Your current study pattern "
-            "is associated with strong performance."
-        )
+        performance_level = "Excellent 🏆"
 
-        performance_level = "Excellent"
+        st.success(
+            "🌟 Excellent! Your current study pattern "
+            "looks strong."
+        )
 
     elif prediction >= 60:
 
-        st.warning(
-            "👍 Good progress! There is still room "
-            "to improve your study pattern."
-        )
+        performance_level = "Good 👍"
 
-        performance_level = "Good"
+        st.warning(
+            "👍 Good progress! You can still improve "
+            "your study habits."
+        )
 
     else:
 
+        performance_level = "Needs Improvement 💪"
+
         st.error(
             "💪 Your predicted score is currently low. "
-            "Improving your study habits can help."
+            "Focus on improving your study routine."
         )
-
-        performance_level = "Needs Improvement"
 
 
     st.write(
@@ -203,69 +219,80 @@ if st.button(
 
     for recommendation in recommendations:
 
-        st.write(
-            f"• {recommendation}"
-        )
+        with st.container(border=True):
+
+            st.write(
+                recommendation
+            )
 
 
     # --------------------------------
-    # Improvement Tips
+    # Focus Areas
     # --------------------------------
 
     st.divider()
 
     st.subheader("🚀 Focus Areas")
 
-    if study_hours < 2:
 
-        st.info(
-            "⏱️ **Study Time:** "
-            "Try gradually increasing your daily study time."
-        )
-
-    else:
-
-        st.success(
-            "⏱️ **Study Time:** "
-            "Your study duration is on a good track."
-        )
+    focus_col1, focus_col2, focus_col3 = st.columns(3)
 
 
-    if tasks_completed < 3:
+    with focus_col1:
 
-        st.info(
-            "📝 **Task Completion:** "
-            "Try completing at least 3 planned tasks regularly."
-        )
+        st.markdown("### ⏱️ Study Time")
 
-    else:
+        if study_hours < 2:
 
-        st.success(
-            "📝 **Task Completion:** "
-            "Good job completing your planned tasks!"
-        )
+            st.warning(
+                "Try gradually increasing your daily study time."
+            )
+
+        else:
+
+            st.success(
+                "Your study duration is on a good track."
+            )
 
 
-    if consistency < 60:
+    with focus_col2:
 
-        st.info(
-            "📅 **Consistency:** "
-            "Create a fixed study routine and follow it daily."
-        )
+        st.markdown("### 📝 Tasks")
 
-    elif consistency < 80:
+        if tasks_completed < 3:
 
-        st.warning(
-            "📅 **Consistency:** "
-            "You're improving. Try reaching 80%+ consistency."
-        )
+            st.warning(
+                "Try completing at least 3 tasks regularly."
+            )
 
-    else:
+        else:
 
-        st.success(
-            "📅 **Consistency:** "
-            "Excellent! You're maintaining a strong routine."
-        )
+            st.success(
+                "Good task completion!"
+            )
+
+
+    with focus_col3:
+
+        st.markdown("### 📅 Consistency")
+
+        if consistency < 60:
+
+            st.warning(
+                "Try following a fixed study routine."
+            )
+
+        elif consistency < 80:
+
+            st.info(
+                "You're improving. Aim for 80%+."
+            )
+
+        else:
+
+            st.success(
+                "Excellent consistency!"
+            )
 
 
     # --------------------------------
@@ -274,40 +301,39 @@ if st.button(
 
     st.divider()
 
-    with st.expander("🧠 How does this prediction work?"):
+    with st.expander("🧠 How does StudyFlow predict performance?"):
 
         st.write(
-            "StudyFlow uses a **Linear Regression** machine "
-            "learning model to estimate your performance score."
+            "StudyFlow uses a **Linear Regression** "
+            "machine learning model."
         )
 
         st.write(
-            "The model considers four inputs:"
+            "The model was trained using four features:"
         )
 
         st.write(
-            "1. ⏱️ Study Hours"
+            "• ⏱️ Study Hours"
         )
 
         st.write(
-            "2. 📝 Tasks Completed"
+            "• 📝 Tasks Completed"
         )
 
         st.write(
-            "3. 📅 Study Consistency"
+            "• 📅 Study Consistency"
         )
 
         st.write(
-            "4. 📈 Previous Performance"
+            "• 📈 Previous Performance"
         )
 
         st.write(
-            "The model learns the relationship between these "
-            "study habits and the performance scores in the "
-            "training dataset."
+            "The model learns the relationship between "
+            "these study habits and performance scores."
         )
 
         st.write(
-            "After training, the model can use new study "
-            "information to predict a performance score."
+            "When you enter new values, the trained model "
+            "uses those values to estimate your performance."
         )
